@@ -8,7 +8,7 @@
   - [exegol](https://github.com/ThePorgs/Exegol)
   - [vscode](https://code.visualstudio.com/)
 
-![image](env.jpg)
+![image](env.png)
 
 ## Installation
 
