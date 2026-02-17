@@ -16,5 +16,4 @@
 ```
 
 ## Fix
-- tools install (tools.txt)
 - fix vscode extensions
