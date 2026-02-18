@@ -13,11 +13,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # URLs
 FZF_URL="https://github.com/junegunn/fzf.git"
 DOCKER_URL="https://get.docker.com/"
+BURP_URL="https://portswigger.net/burp/releases/download?product=pro&type=Linux"
 
 # Colors
 GREEN='\033[1;32m'
 RED='\033[0;31m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
 # Helper Functions
 log() {
@@ -108,7 +109,7 @@ install_fonts() {
             fi
             
             unzip -o "${font}.zip" -d ~/.local/share/fonts/
-            touch ~/.local/share/fonts/$font/complete # Create marker
+            touch ~/.local/share/fonts/$font/complete
             rm "${font}.zip"
         else
             log "Font $font likely already installed."
@@ -122,6 +123,7 @@ install_alacritty() {
     log "Fetching latest Alacritty version..."
     local ALACRITTY_TAG=$(get_latest_release "barnumbirr/alacritty-debian")
     local ALACRITTY_VERSION=${ALACRITTY_TAG#v}
+
     local DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/barnumbirr/alacritty-debian/releases/latest" | grep "browser_download_url.*amd64_bullseye.deb" | cut -d '"' -f 4 | head -n 1)
     local DEB_NAME=$(basename "$DOWNLOAD_URL")
 
@@ -145,10 +147,12 @@ install_fzf() {
     log "Installing fzf..."
     if [ ! -d ~/.fzf ]; then
         git clone --depth 1 "$FZF_URL" ~/.fzf
-        ~/.fzf/install --all
     else
-        log "fzf already installed."
+        log "fzf directory exists. Updating..."
+        (cd ~/.fzf && git pull) || true
     fi
+
+    ~/.fzf/install --all
 }
 
 install_docker() {
@@ -166,18 +170,20 @@ install_docker() {
 }
 
 install_exegol() {
+    if ! check_command pipx; then
+        sed -i '/Installing exegol & pipx/d' "$PROGRESS_FILE" 2>/dev/null || true
+    fi
+
     log "Installing Exegol..."
     if ! check_command pipx; then
         log "Installing pipx..."
         sudo apt-get install -y pipx || python3 -m pip install --user pipx --break-system-packages
-        
         pipx ensurepath
         export PATH="$HOME/.local/bin:$PATH"
     fi
     
     if ! pipx list | grep -q 'exegol'; then
         pipx install exegol
-
         if getent group docker >/dev/null; then
              sudo usermod -aG docker "$USER"
              log "User added to docker group. Please logout/login later."
@@ -208,14 +214,24 @@ install_vscode() {
     fi
 }
 
-setup_env() {
     log "Setting up environment..."
     pip3 install --user pywal
     
     mkdir -p ~/.config/{i3,compton,rofi,alacritty}
     
     [ -f "$SCRIPT_DIR/.config/i3/config" ] && cp "$SCRIPT_DIR/.config/i3/config" ~/.config/i3/config
-    [ -f "$SCRIPT_DIR/.config/alacritty/alacritty.yml" ] && cp "$SCRIPT_DIR/.config/alacritty/alacritty.yml" ~/.config/alacritty/alacritty.yml
+    if [ -f "$SCRIPT_DIR/.config/alacritty/alacritty.yml" ]; then
+        cp "$SCRIPT_DIR/.config/alacritty/alacritty.yml" ~/.config/alacritty/alacritty.yml
+        local alacritty_conf=~/.config/alacritty/alacritty.yml
+        sed -i '/^\s*double_click:/d' "$alacritty_conf"
+        sed -i '/^\s*triple_click:/d' "$alacritty_conf"
+        sed -i '/^\s*hints:/d' "$alacritty_conf"
+        sed -i '/^\s*auto_scroll:/d' "$alacritty_conf"
+        sed -i '/^\s*faux_multiplier:/d' "$alacritty_conf"
+        sed -i '/^\s*dynamic_title:/d' "$alacritty_conf"
+        sed -i '/^\s*enable_experimental_conpty_backend:/d' "$alacritty_conf"
+        sed -i '/^\s*tabspace:/d' "$alacritty_conf"
+    fi
     [ -f "$SCRIPT_DIR/.config/i3/i3blocks.conf" ] && cp "$SCRIPT_DIR/.config/i3/i3blocks.conf" ~/.config/i3/i3blocks.conf
     [ -f "$SCRIPT_DIR/.config/compton/compton.conf" ] && cp "$SCRIPT_DIR/.config/compton/compton.conf" ~/.config/compton/compton.conf
     [ -f "$SCRIPT_DIR/.config/rofi/config" ] && cp "$SCRIPT_DIR/.config/rofi/config" ~/.config/rofi/config
@@ -250,9 +266,21 @@ install_oh_my_zsh() {
     
     local ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
     
-    [ ! -d "${ZSH_CUSTOM}/plugins/zsh-completions" ] && git clone https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM}/plugins/zsh-completions"
-    [ ! -d "${ZSH_CUSTOM}/plugins/zsh-autosuggestions" ] && git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
-    [ ! -d "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting" ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+    [ -d "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting" ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+
+    if [ -f ~/.zshrc ]; then
+        log "Configuring Zsh plugins..."
+        cp ~/.zshrc ~/.zshrc.bak
+        
+        if grep -q "plugins=(git)" ~/.zshrc; then
+            sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
+            log "Plugins enabled in .zshrc"
+        elif grep -q "plugins=(" ~/.zshrc; then
+            log "Custom plugins definition found. Please manually add 'zsh-autosuggestions' and 'zsh-syntax-highlighting' to ~/.zshrc"
+        else
+            log "No modules line found in .zshrc"
+        fi
+    fi
 }
 
 install_modern_tools() {
@@ -267,7 +295,6 @@ install_modern_tools() {
         log "Aliased batcat to bat."
     fi
 
-    # Cargo tools
     export PATH="$HOME/.cargo/bin:$PATH"
     
     local cargo_tools=(
@@ -308,7 +335,7 @@ install_modern_tools() {
         error "Go is not installed, skipping Go tools."
     fi
 
-    # Git tools
+    # Scripts / Git
     if [ ! -d ~/.asdf ]; then
         log "Installing asdf..."
         git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
@@ -325,9 +352,32 @@ install_modern_tools() {
     fi
 }
 
-# Run
+install_burp() {
+    log "Installing Burp Suite Pro..."
+    if [ -d "/opt/BurpSuitePro" ] || [ -d "$HOME/BurpSuitePro" ]; then
+         log "Burp Suite Pro seems to be installed."
+         if [ -f "burpsuite_installer.sh" ]; then rm "burpsuite_installer.sh"; fi
+         return
+    fi
+    
+    local installer="burpsuite_installer.sh"
+    
+    if [ -f "$installer" ]; then
+        log "Found existing installer $installer, skipping download."
+    else
+        log "Downloading Burp Suite Pro installer..."
+        wget -O "$installer" --show-progress "$BURP_URL"
+    fi
+    
+    chmod +x "$installer"
+    
+    log "Running installer in unattended mode..."
+    ./"$installer" -q
+    rm "$installer"
+}
 
 step 10 "Installing base" install_base
+step 15 "Installing Oh My Zsh" install_oh_my_zsh
 step 25 "Installing fonts" install_fonts
 step 40 "Installing alacritty" install_alacritty
 step 50 "Installing fzf" install_fzf
@@ -336,8 +386,9 @@ step 60 "Installing exegol & pipx" install_exegol
 step 80 "Installing vscode" install_vscode
 step 90 "Env settings" setup_env
 step 92 "Installing i3-gaps" install_i3_gaps
-step 95 "Installing Oh My Zsh" install_oh_my_zsh
+
 step 98 "Installing Modern Tools" install_modern_tools
+step 99 "Installing Burp Suite Pro" install_burp
 
 echo -e "\r${GREEN}[+]${NC} Installation complete! :)"
 log "Installation finished successfully."
