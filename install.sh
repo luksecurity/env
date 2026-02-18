@@ -184,6 +184,7 @@ install_exegol() {
     
     if ! pipx list | grep -q 'exegol'; then
         pipx install exegol
+        echo "alias exegol='sudo -E $(echo ~/.local/bin/exegol)'" >> ~/.zshrc && source ~/.zshrc
         if getent group docker >/dev/null; then
              sudo usermod -aG docker "$USER"
              log "User added to docker group. Please logout/login later."
