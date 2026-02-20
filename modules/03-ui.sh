@@ -7,17 +7,31 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 source "$ROOT_DIR/lib.sh"
 
 install_fonts() {
-    local VERSION=$(get_latest_release "ryanoasis/nerd-fonts")
+    log "Installing Nerd Fonts..."
+
+    local VERSION
+    VERSION=$(get_latest_release "ryanoasis/nerd-fonts")
+
+    log "Latest version: $VERSION"
 
     mkdir -p ~/.local/share/fonts/
 
     for font in Iosevka RobotoMono; do
-        wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/${VERSION}/${font}.zip"
-        unzip -o "${font}.zip" -d ~/.local/share/fonts/
+        log "Downloading $font..."
+        wget -q --show-progress \
+            "https://github.com/ryanoasis/nerd-fonts/releases/download/${VERSION}/${font}.zip"
+
+        log "Extracting $font..."
+        unzip -o "${font}.zip" -d ~/.local/share/fonts/ >/dev/null
+
         rm "${font}.zip"
+        log "$font installed ✅"
     done
 
-    fc-cache -fv
+    log "Refreshing font cache..."
+    fc-cache -fv >/dev/null
+
+    log "Fonts installation complete ✅"
 }
 
 install_alacritty() {
