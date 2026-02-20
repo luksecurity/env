@@ -6,7 +6,7 @@ Automated and modular bootstrap script to provision a full Ubuntu-based penetrat
 
 ## Preview
 
-![](assets/setup.png)
+![](assets/wallpaper/setup.png)
 ---
 
 ## Changes in this fork
