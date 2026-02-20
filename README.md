@@ -1,20 +1,36 @@
-# fork of the xct env with personal tweaks :
-- redesign of the installation script
-- increase font size
-- installation of additional tools :
-  - [burp suite pro](https://portswigger.net/burp/pro)
-  - [fzf](https://github.com/junegunn/fzf)
-  - [docker](https://www.docker.com/)
-  - [exegol](https://github.com/ThePorgs/Exegol)
-  - [vscode](https://code.visualstudio.com/)
+# 🛠 Pentest Setup
 
-![image](env.png)
+Automated and modular bootstrap script to provision a full Ubuntu-based penetration testing workstation.
 
-## Installation
+⚠️ This repository is a **fork of the original xct setup**, with architectural and tooling improvements.
 
+---
+
+## ✅ Changes in This Fork
+
+- Modular structure (`modules/`)
+- Centralized `bootstrap.sh`
+- Idempotent step system
+- Rust installed via `rustup` (instead of apt)
+- Clean Go environment setup
+- Clear separation: system / shell / UI / devtools
+- Reproducible and maintainable design
+
+---
+
+## 🚀 Installation
+
+```bash
+git clone https://github.com/luksecurity/pentest-setup.git
+cd pentest-setup/
+chmod +x bootstrap.sh
+./bootstrap.sh
 ```
-./install.sh
-```
 
-## Fix
-- fix vscode extensions
+🔁 Re-run a Step
+
+```bash
+rm -f .done_<step_name>
+```
+chmod +x bootstrap.sh
+./bootstrap.sh
