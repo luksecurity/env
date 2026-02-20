@@ -38,7 +38,9 @@ chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
-![Installation Preview](assets/install.png)
+<p align="center">
+  <img src="assets/install.png" width="600">
+</p>
 
 🔁 Re-run a Step
 
