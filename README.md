@@ -6,7 +6,7 @@ Automated and modular bootstrap script to provision a full Ubuntu-based penetrat
 
 ---
 
-## ✅ Changes in This Fork
+## ✅ Changes in this fork
 
 - Modular structure (`modules/`)
 - Centralized `bootstrap.sh`
@@ -18,7 +18,7 @@ Automated and modular bootstrap script to provision a full Ubuntu-based penetrat
 
 ---
 
-## 🔐 Included Tooling
+## 🔐 Included tooling
 
 This setup provisions a ready-to-use offensive security environment, including:
 
@@ -37,6 +37,8 @@ cd pentest-setup/
 chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
+
+![Installation Preview](assets/install.png)
 
 🔁 Re-run a Step
 
