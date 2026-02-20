@@ -146,7 +146,7 @@ client.urgent #900000 #900000 #ffffff
 default_border normal
 
 # feh - Wallpaper Setter
-exec_always --no-startup-id sh ~/.fehbg
+exec_always --no-startup-id feh --bg-fill /home/luksc/.wallpaper/23.jpg
 
 # compton - Compositing Manager for Shadows and Opacity
 exec_always --no-startup-id compton -b --config ~/.config/compton/compton.conf
