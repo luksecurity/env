@@ -27,7 +27,6 @@ This setup provisions a ready-to-use offensive security environment, including:
 
 - **Docker**
 - **Exegol**
-- **Burp Suite Pro**
 - **VSCode**
 - Common CLI tooling (git, curl, build tools, etc.)
 - Rust & Go development environments
