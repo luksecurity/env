@@ -37,8 +37,8 @@ This setup provisions a ready-to-use offensive security environment, including:
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/luksecurity/pentest-setup.git
-cd pentest-setup/
+git clone https://github.com/luksecurity/blackpearl.git
+cd blackpearl/
 chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
