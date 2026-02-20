@@ -11,24 +11,30 @@ install_rust() {
         log "Rust already installed"
     else
         log "Installing Rust via rustup..."
-        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        curl -fsSL https://sh.rustup.rs | sh -s -- -y
     fi
 
-    # Load cargo env
-    source "$HOME/.cargo/env"
+    # Load cargo env safely
+    if [ -f "$HOME/.cargo/env" ]; then
+        # shellcheck disable=SC1090
+        source "$HOME/.cargo/env"
+    fi
+
+    export PATH="$HOME/.cargo/bin:$PATH"
 
     log "Updating Rust toolchain..."
-    rustup update
+    rustup update || log "Rust update failed (continuing)"
 }
 
 install_go_env() {
     if ! command -v go &>/dev/null; then
-        log "Go not found. Please install Go first."
+        log "Go not found. Install Go first."
         exit 1
     fi
 
-    export GOPROXY="https://proxy.golang.org,direct"
+    log "Configuring Go proxy..."
     go env -w GOPROXY="https://proxy.golang.org,direct"
+    go env -w GOSUMDB="sum.golang.org"
 }
 
 install_modern_tools() {
@@ -36,12 +42,14 @@ install_modern_tools() {
     log "Installing Rust toolchain..."
     install_rust
 
-    export PATH="$HOME/.cargo/bin:$PATH"
-
     log "Installing Rust CLI tools..."
     for tool in bottom procs git-delta du-dust navi; do
-        log "Installing $tool..."
-        cargo install "$tool" || log "Failed to install $tool (continuing)"
+        if command -v "$tool" &>/dev/null; then
+            log "$tool already installed"
+        else
+            log "Installing $tool..."
+            cargo install "$tool" || log "Failed to install $tool (continuing)"
+        fi
     done
 
     log "Installing Go tools..."
@@ -49,21 +57,38 @@ install_modern_tools() {
 
     export PATH="$HOME/go/bin:$PATH"
 
-    go install github.com/charmbracelet/glow@latest || log "Glow failed"
-    go install github.com/tomnomnom/gron@latest || log "Gron failed"
+    for tool in \
+        github.com/charmbracelet/glow@latest \
+        github.com/tomnomnom/gron@latest; do
+
+        log "Installing $(basename "$tool")..."
+        go install "$tool" || log "Failed: $tool"
+    done
 
     log "Installing asdf..."
-    [ -d ~/.asdf ] || git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.13.1
+    if [ ! -d "$HOME/.asdf" ]; then
+        git clone https://github.com/asdf-vm/asdf.git "$HOME/.asdf" --branch v0.13.1
+    else
+        log "asdf already installed"
+    fi
 
     log "Installing ptf..."
-    [ -d ~/.ptf ] || git clone https://github.com/mubix/ptf ~/.ptf
+    if [ ! -d "$HOME/.ptf" ]; then
+        git clone https://github.com/mubix/ptf "$HOME/.ptf"
+    else
+        log "ptf already installed"
+    fi
 
     log "Installing zoxide..."
-    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+    if ! command -v zoxide &>/dev/null; then
+        curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+    else
+        log "zoxide already installed"
+    fi
 
-    log "Adding ~/.local/bin to PATH if missing..."
-    if ! grep -q '.local/bin' ~/.zshrc 2>/dev/null; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+    log "Ensuring ~/.local/bin is in PATH..."
+    if ! grep -q '.local/bin' "$HOME/.zshrc" 2>/dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
     fi
 
     log "Devtools installation complete ✅"
