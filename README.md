@@ -1,15 +1,15 @@
-# 🛠 Blackpearl
+# Blackpearl
 
 Automated and modular bootstrap script to provision a full Ubuntu-based penetration testing workstation.
 
 ⚠️ This repository is a **fork of the original xct setup**, with architectural and tooling improvements.
 
-## 🖥 Preview
+## Preview
 
 <screen>
 ---
 
-## ✅ Changes in this fork
+## Changes in this fork
 
 - Modular structure (`modules/`)
 - Centralized `bootstrap.sh`
@@ -21,7 +21,7 @@ Automated and modular bootstrap script to provision a full Ubuntu-based penetrat
 
 ---
 
-## 🔐 Included tooling
+## Included tooling
 
 This setup provisions a ready-to-use offensive security environment, including:
 
@@ -32,7 +32,7 @@ This setup provisions a ready-to-use offensive security environment, including:
 - Common CLI tooling (git, curl, build tools, etc.)
 - Rust & Go development environments
 
-## 🚀 Installation
+## Installation
 
 ```bash
 git clone https://github.com/luksecurity/blackpearl.git
@@ -41,7 +41,7 @@ chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
-🔁 Re-run a Step
+## Re-run a Step
 
 ```bash
 rm -f .done_<step_name>
