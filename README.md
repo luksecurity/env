@@ -38,7 +38,7 @@ chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
-<p align="center">
+<p align="left">
   <img src="assets/install.png" width="600">
 </p>
 
