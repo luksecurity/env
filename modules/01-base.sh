@@ -11,7 +11,7 @@ install_base() {
 
     sudo apt install -y \
         arandr flameshot arc-theme feh i3blocks i3status i3 lxappearance \
-        python3-pip python3-venv rofi unclutter xclip \
+        python3-pip python3-venv rofi unclutter xclip compton \
         papirus-icon-theme imagemagick \
         libxcb-shape0-dev libxcb-keysyms1-dev libpango1.0-dev \
         libxcb-util0-dev libxcb1-dev libxcb-icccm4-dev libyajl-dev \
