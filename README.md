@@ -32,5 +32,3 @@ chmod +x bootstrap.sh
 ```bash
 rm -f .done_<step_name>
 ```
-chmod +x bootstrap.sh
-./bootstrap.sh
