@@ -6,9 +6,7 @@ Automated and modular bootstrap script to provision a full Ubuntu-based penetrat
 
 ## 🖥 Preview
 
-<p align="left">
-  <img src="assets/setup.png" width="800">
-</p>
+<screen>
 ---
 
 ## ✅ Changes in this fork
@@ -42,10 +40,6 @@ cd blackpearl/
 chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
-
-<p align="left">
-  <img src="assets/install.png" width="600">
-</p>
 
 🔁 Re-run a Step
 
