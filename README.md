@@ -1,5 +1,11 @@
 # 🛠 Pentest Setup
 
+## 🖥 Preview
+
+<p align="left">
+  <img src="assets/setup.png" width="800">
+</p>
+
 Automated and modular bootstrap script to provision a full Ubuntu-based penetration testing workstation.
 
 ⚠️ This repository is a **fork of the original xct setup**, with architectural and tooling improvements.
